@@ -4,7 +4,7 @@ from flask import abort
 import joblib
 
 # Load saved model artifact
-model_artifact = joblib.load("C:/Users/ADMIN/Documents/Projects/online transactions/model.joblib")
+model_artifact = joblib.load("model.joblib")
 features = model_artifact["ordered_columns"]
 rf_model = model_artifact["rf_model"]
 model_threshold = model_artifact["rf_model_threshold"]
