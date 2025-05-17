@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transaction Fraud Detector</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      background-color: #f4f4f4;
+    }
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0px 0px 10px #ccc;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .result {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 1.2em;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Transaction Fraud Detector</h2>
+    <form id="predictForm">
+      <label>Transaction Type:</label>
+      <select id="type">
+        <option value="PAYMENT">PAYMENT</option>
+        <option value="TRANSFER">TRANSFER</option>
+        <option value="CASH_OUT">CASH_OUT</option>
+        <option value="DEBIT">DEBIT</option>
+      </select>
+
+      <label>Amount:</label>
+      <input type="number" id="amount" required />
+
+      <label>Old Balance (Sender):</label>
+      <input type="number" id="oldbalanceOrg" required />
+
+      <label>New Balance (Sender):</label>
+      <input type="number" id="newbalanceOrig" required />
+
+      <label>Old Balance (Receiver):</label>
+      <input type="number" id="oldbalanceDest" required />
+
+      <label>New Balance (Receiver):</label>
+      <input type="number" id="newbalanceDest" required />
+
+      <button type="submit">Predict</button>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("predictForm");
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const payload = {
+        data: [
+          {
+            type: document.getElementById("type").value,
+            amount: parseFloat(document.getElementById("amount").value),
+            oldbalanceOrg: parseFloat(document.getElementById("oldbalanceOrg").value),
+            newbalanceOrig: parseFloat(document.getElementById("newbalanceOrig").value),
+            oldbalanceDest: parseFloat(document.getElementById("oldbalanceDest").value),
+            newbalanceDest: parseFloat(document.getElementById("newbalanceDest").value),
+          }
+        ]
+      };
+
+      const response = await fetch("https://online-transactions.onrender.com/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await response.json();
+      document.getElementById("result").innerText = "Prediction: " + result.predictions[0];
+    });
+  </script>
+</body>
+</html>
