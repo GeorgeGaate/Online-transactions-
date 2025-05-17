@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, abort
+from flask import Flask, request, render_template, jsonify, abort
 from flask_cors import CORS
 import joblib
 
@@ -39,7 +39,7 @@ CORS(app)
 # Home route to confirm API is live
 @app.route("/", methods=["GET"])
 def home():
-    return jsonify({"message": "Fraud Detection API is live!"})
+    return render_template("index.html")
 
 # Define prediction endpoint
 @app.route("/predict", methods=["POST"])
@@ -54,3 +54,4 @@ def predict():
         return jsonify({"predictions": final_output})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
