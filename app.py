@@ -1,6 +1,5 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort
 from flask_cors import CORS
-from flask import abort
 import joblib
 
 # Load saved model artifact
@@ -37,15 +36,21 @@ def post_process(output):
 app = Flask(__name__)
 CORS(app)
 
+# Home route to confirm API is live
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({"message": "Fraud Detection API is live!"})
+
 # Define prediction endpoint
 @app.route("/predict", methods=["POST"])
 def predict():
-    data = request.json["data"]
-    input_array = pre_process(data, features)
-    output = make_prediction(input_array, rf_model, model_threshold)
-    final_output = post_process(output)
-    return {"predictions": final_output}
-
-# Run locally using Flask development server
-if __name__ == "__main__":
-    app.run(host="127.0.0.1", port=8890, debug=True)
+    try:
+        data = request.json.get("data")
+        if not data:
+            abort(400, description="Missing 'data' in request JSON.")
+        input_array = pre_process(data, features)
+        output = make_prediction(input_array, rf_model, model_threshold)
+        final_output = post_process(output)
+        return jsonify({"predictions": final_output})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
